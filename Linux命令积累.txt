@@ -1,0 +1,60 @@
+﻿1、拷贝所有目录
+  cp -R * ../../WEB-INF/classes
+  cd HepWeb.war/rdp/class;   
+  cp -R * ../../WEB-INF/classes
+2、查找含有指定字符串的指定文件
+grep -r 1111 *.xml   //内容与目录
+grep -l 1111 *.xml	//只列出目录
+
+3、ls -alrt # 按修改时间排序文件
+4、数据库备份
+expdp rdptest/rdptest@RDPDB  directory=DUMPDIR dumpfile=`date -d "now" +%Y%m%d`test.dmp schemas=rdptest logfile=`date -d "now" +%Y%m%d`test.log
+
+expdp rdpauth/rdpauth@RDPDB  directory=RDPDIR dumpfile=20150819_0%u.dmp parallel=8 schemas=rdpauth logfile=20150819_rdpauth.log
+5、修改用户权限
+chown -R rdpdev:rdpdev /apps/rdpdev
+6、以兆为单位查看文件大小
+ll -lh
+7、oracle创建用户
+create user rdplf identified by rdplf default tablespace RDP_DATA;
+
+create user rdppufa identified by rdppufa;
+
+GRANT CONNECT,RESOURCE,dba TO rdplf;
+GRANT DEBUG CONNECT SESSION to rdplf;
+GRANT CREATE ANY SYNONYM TO rdplf;
+GRANT CREATE ANY VIEW TO rdplf;
+GRANT CREATE ANY LIBRARY TO rdplf;
+GRANT CREATE DATABASE LINK TO rdplf;
+GRANT CREATE ANY SEQUENCE TO rdplf;
+GRANT MANAGE SCHEDULER TO rdplf;
+GRANT CREATE ANY JOB TO rdplf;
+GRANT CREATE EXTERNAL JOB TO rdplf; 
+GRANT UNLIMITED TABLESPACE TO rdplf;
+GRANT ALTER SYSTEM TO rdplf;
+GRANT CREATE SESSION TO rdplf;
+8、oracle导入dmp
+impdp rdpzc/rdpzc directory=DUMPDIR  dumpfile=`date -d "now" +%Y%m%d`test.dmp REMAP_SCHEMA=rdptest:rdpcz REMAP_TABLESPACE=USERS:USERS table_exists_action=replace PARALLEL=8 logfile=impdp_parm_`date -d "now" +%Y%m%d`.log ;
+
+9、创建用户 
+useradd -s /bin/ksh -d /apps/rdplt rdplt -g rdplt
+passwd rdpdev
+chown -R rdpdev:rdpdev /apps/rdpdev
+
+10、tar -zcvf HepWeb.tar.gz HepWeb.war --exclude HepWeb.war/rdp/log
+
+11、oracle导出/导入指定表
+exp rdptest/rdptest@RDPDB file=rdptest.dmp tables=rdplog,rdpprintdata
+
+imp rdptest/rdptest@RDPDB file=rdptest.dmp full=y ignore=y
+
+12、启动数据库
+手动启动：
+用 oracle用户登录（或su - oracle)
+lsnrctl start 
+sqlplus / as sysdba
+  startup
+  exit
+  
+13、列出当前目录下所有文件夹大小
+du -sh *
